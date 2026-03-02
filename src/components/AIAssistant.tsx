@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { GoogleGenAI } from "@google/genai";
 import { Send, Bot, User, Loader2, Sparkles } from 'lucide-react';
 import Markdown from 'react-markdown';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
 import { cn } from '../lib/utils';
 
 interface Message {
@@ -33,7 +31,7 @@ export const AIAssistant: React.FC = () => {
           parts: [{ text: m.content }]
         })),
         config: {
-          systemInstruction: "Ești un profesor de matematică expert pentru profilul tehnologic din România (clasele 9-12). Răspunde în limba română, explică clar pașii și folosește formatare LaTeX pentru formule matematice (ex: $x^2$, $\\frac{a}{b}$). Fii încurajator.",
+          systemInstruction: "Ești un profesor de matematică expert pentru profilul tehnologic din România (clasele 9-12). Răspunde în limba română, explică clar pașii și folosește limbaj matematic simplu, fără simboluri speciale precum $ sau LaTeX. Folosește notații precum x^2, sqrt(x), a/b. Fii încurajator.",
         }
       });
 
@@ -71,7 +69,7 @@ export const AIAssistant: React.FC = () => {
               {m.role === 'user' ? <User size={16} /> : <Bot size={16} />}
             </div>
             <div className={cn("max-w-[80%] p-3 rounded-2xl text-sm", m.role === 'user' ? "bg-indigo-600 text-white rounded-tr-none" : "bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-tl-none")}>
-              <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{m.content}</Markdown>
+              <Markdown>{m.content}</Markdown>
             </div>
           </div>
         ))}

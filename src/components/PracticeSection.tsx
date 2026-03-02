@@ -4,8 +4,7 @@ import { CheckCircle2, XCircle, HelpCircle, ArrowRight, RotateCcw } from 'lucide
 import { Problem } from '../types';
 import { cn } from '../lib/utils';
 import Markdown from 'react-markdown';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
+import confetti from 'canvas-confetti';
 
 interface PracticeSectionProps {
   problems: Problem[];
@@ -20,6 +19,46 @@ export const PracticeSection: React.FC<PracticeSectionProps> = ({ problems }) =>
 
   const currentProblem = problems[currentProblemIndex];
 
+  const playSound = (type: 'correct' | 'incorrect' | 'complete') => {
+    const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    if (type === 'correct') {
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+      oscillator.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.1); // C6
+      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.2);
+    } else if (type === 'incorrect') {
+      oscillator.type = 'sawtooth';
+      oscillator.frequency.setValueAtTime(110, audioCtx.currentTime);
+      oscillator.frequency.linearRampToValueAtTime(55, audioCtx.currentTime + 0.2);
+      gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.3);
+    } else if (type === 'complete') {
+      // Arpeggio
+      [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime + i * 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.1 + 0.3);
+        osc.start(audioCtx.currentTime + i * 0.1);
+        osc.stop(audioCtx.currentTime + i * 0.1 + 0.3);
+      });
+    }
+  };
+
   const handleOptionSelect = (index: number) => {
     if (isSubmitted) return;
     setSelectedOption(index);
@@ -30,6 +69,9 @@ export const PracticeSection: React.FC<PracticeSectionProps> = ({ problems }) =>
     setIsSubmitted(true);
     if (selectedOption === currentProblem.correctAnswer) {
       setScore(prev => prev + 1);
+      playSound('correct');
+    } else {
+      playSound('incorrect');
     }
   };
 
@@ -40,6 +82,14 @@ export const PracticeSection: React.FC<PracticeSectionProps> = ({ problems }) =>
       setIsSubmitted(false);
     } else {
       setShowResults(true);
+      if (score + (selectedOption === currentProblem.correctAnswer ? 1 : 0) >= problems.length / 2) {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+        playSound('complete');
+      }
     }
   };
 
@@ -87,7 +137,7 @@ export const PracticeSection: React.FC<PracticeSectionProps> = ({ problems }) =>
 
       <div className="p-6">
         <div className="text-lg font-medium text-zinc-900 dark:text-zinc-100 mb-6">
-          <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{currentProblem.question}</Markdown>
+          <Markdown>{currentProblem.question}</Markdown>
         </div>
 
         <div className="space-y-3">
@@ -121,7 +171,7 @@ export const PracticeSection: React.FC<PracticeSectionProps> = ({ problems }) =>
                   )}>
                     {String.fromCharCode(65 + index)}
                   </span>
-                  <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{option}</Markdown>
+                  <Markdown>{option}</Markdown>
                 </div>
                 {isSubmitted && isCorrect && <CheckCircle2 className="text-emerald-500" size={20} />}
                 {isSubmitted && isSelected && !isCorrect && <XCircle className="text-red-500" size={20} />}
@@ -145,7 +195,7 @@ export const PracticeSection: React.FC<PracticeSectionProps> = ({ problems }) =>
               {selectedOption === currentProblem.correctAnswer ? "Corect!" : "Incorect!"}
             </p>
             <div className="text-sm opacity-90">
-              <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{currentProblem.explanation}</Markdown>
+              <Markdown>{currentProblem.explanation}</Markdown>
             </div>
           </motion.div>
         )}

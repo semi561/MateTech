@@ -28,6 +28,21 @@ export interface Lesson {
   problems?: Problem[];
 }
 
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  unlocked: boolean;
+}
+
+export interface Flashcard {
+  id: string;
+  front: string;
+  back: string;
+  category: string;
+}
+
 export interface Topic {
   id: string;
   title: string;

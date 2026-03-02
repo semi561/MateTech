@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { BookOpen, ChevronRight, GraduationCap, Menu, X, Calculator, Info, Search, Sun, Moon, Star } from 'lucide-react';
+import { BookOpen, ChevronRight, GraduationCap, Menu, X, Calculator, Info, Search, Sun, Moon, Star, Sparkles, Zap } from 'lucide-react';
 import Markdown from 'react-markdown';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
 import { CURRICULUM } from './constants';
 import { Grade, Topic, Lesson } from './types';
 import { AIAssistant } from './components/AIAssistant';
@@ -13,10 +11,29 @@ import { StudyTimer } from './components/StudyTimer';
 import { NotesSection } from './components/NotesSection';
 import { ProgressTracker } from './components/ProgressTracker';
 import { Glossary } from './components/Glossary';
-import { BacSimulator } from './components/BacSimulator';
+import { BacExamMode } from './components/BacExamMode';
+import { UltimateMath } from './components/UltimateMath';
+import { GlobalChat } from './components/GlobalChat';
+import { AchievementSystem } from './components/AchievementSystem';
+import { MentalMathGame } from './components/MentalMathGame';
+import { ExamCountdown } from './components/ExamCountdown';
+import { FlashcardSystem } from './components/FlashcardSystem';
+import { FunctionPlotter } from './components/FunctionPlotter';
+import { GlobalSearch } from './components/GlobalSearch';
+import { Leaderboard } from './components/Leaderboard';
+import { ReviewCenter } from './components/ReviewCenter';
+import { NoteExport } from './components/NoteExport';
+import { DashboardSettings } from './components/DashboardSettings';
+import { QuickActionMenu } from './components/QuickActionMenu';
+import { ProgressCharts } from './components/ProgressCharts';
+import { DailyMathQuote } from './components/DailyMathQuote';
+import { StudyPlanner } from './components/StudyPlanner';
+import { MathDictionary } from './components/MathDictionary';
+import { DailyChallenge } from './components/DailyChallenge';
+import { MathNews } from './components/MathNews';
 import { cn } from './lib/utils';
 
-type View = 'curriculum' | 'formulas' | 'simulator' | 'dashboard' | 'glossary';
+type View = 'curriculum' | 'formulas' | 'simulator' | 'dashboard' | 'glossary' | 'ultimate' | 'flashcards' | 'bac-exam';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<View>('curriculum');
@@ -26,6 +43,8 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [showAI, setShowAI] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isFocusMode, setIsFocusMode] = useState(false);
+  const [streak, setStreak] = useState(5);
 
   React.useEffect(() => {
     if (isDarkMode) {
@@ -68,12 +87,34 @@ export default function App() {
         <nav className="hidden md:flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl">
           <button onClick={() => setCurrentView('curriculum')} className={cn("px-4 py-1.5 rounded-lg text-sm font-medium transition-all", currentView === 'curriculum' ? "bg-white dark:bg-zinc-700 text-indigo-600 shadow-sm" : "text-zinc-500 hover:text-zinc-800")}>Lecții</button>
           <button onClick={() => setCurrentView('formulas')} className={cn("px-4 py-1.5 rounded-lg text-sm font-medium transition-all", currentView === 'formulas' ? "bg-white dark:bg-zinc-700 text-indigo-600 shadow-sm" : "text-zinc-500 hover:text-zinc-800")}>Formule</button>
+          <button onClick={() => setCurrentView('flashcards')} className={cn("px-4 py-1.5 rounded-lg text-sm font-medium transition-all", currentView === 'flashcards' ? "bg-white dark:bg-zinc-700 text-indigo-600 shadow-sm" : "text-zinc-500 hover:text-zinc-800")}>Flashcards</button>
+          <button onClick={() => setCurrentView('bac-exam')} className={cn("px-4 py-1.5 rounded-lg text-sm font-medium transition-all", currentView === 'bac-exam' ? "bg-white dark:bg-zinc-700 text-rose-600 shadow-sm" : "text-zinc-500 hover:text-zinc-800")}>Examen BAC</button>
           <button onClick={() => setCurrentView('simulator')} className={cn("px-4 py-1.5 rounded-lg text-sm font-medium transition-all", currentView === 'simulator' ? "bg-white dark:bg-zinc-700 text-indigo-600 shadow-sm" : "text-zinc-500 hover:text-zinc-800")}>Simulare</button>
           <button onClick={() => setCurrentView('glossary')} className={cn("px-4 py-1.5 rounded-lg text-sm font-medium transition-all", currentView === 'glossary' ? "bg-white dark:bg-zinc-700 text-indigo-600 shadow-sm" : "text-zinc-500 hover:text-zinc-800")}>Glosar</button>
           <button onClick={() => setCurrentView('dashboard')} className={cn("px-4 py-1.5 rounded-lg text-sm font-medium transition-all", currentView === 'dashboard' ? "bg-white dark:bg-zinc-700 text-indigo-600 shadow-sm" : "text-zinc-500 hover:text-zinc-800")}>Progres</button>
+          <button onClick={() => setCurrentView('ultimate')} className={cn("px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5", currentView === 'ultimate' ? "bg-orange-500 text-white shadow-sm" : "text-orange-600 hover:bg-orange-50")}>
+            <Sparkles size={14} />
+            Ultimate
+          </button>
         </nav>
 
         <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-xl border border-amber-100 dark:border-amber-800/50">
+            <Star size={16} fill="currentColor" />
+            <span className="text-xs font-black">{streak} Zile</span>
+          </div>
+          <GlobalSearch onSelectLesson={(grade, lesson) => {
+            setSelectedGrade(grade);
+            setSelectedLesson(lesson);
+            setCurrentView('curriculum');
+          }} />
+          <button 
+            onClick={() => setIsFocusMode(!isFocusMode)}
+            className={cn("p-2 rounded-xl transition-colors", isFocusMode ? "bg-indigo-600 text-white" : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800")}
+            title="Focus Mode"
+          >
+            <Zap size={20} />
+          </button>
           <button 
             onClick={() => setIsDarkMode(!isDarkMode)}
             className="p-2 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors"
@@ -98,7 +139,8 @@ export default function App() {
         <aside className={cn(
           "fixed inset-y-0 left-0 z-40 w-72 border-r transform transition-transform duration-300 lg:relative lg:translate-x-0",
           isDarkMode ? "bg-zinc-900 border-zinc-800" : "bg-white border-zinc-200",
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          isSidebarOpen && !isFocusMode ? "translate-x-0" : "-translate-x-full",
+          isFocusMode && "hidden lg:hidden"
         )}>
           <div className="h-full flex flex-col">
             <div className="p-4 border-b border-zinc-100 dark:border-zinc-800">
@@ -176,7 +218,7 @@ export default function App() {
               ) : currentView === 'simulator' ? (
                 <motion.div key="simulator" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
                   <h2 className="text-3xl font-bold mb-6">Simulare BAC</h2>
-                  <BacSimulator />
+                  <BacExamMode />
                 </motion.div>
               ) : currentView === 'glossary' ? (
                 <motion.div key="glossary" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
@@ -185,24 +227,43 @@ export default function App() {
                 </motion.div>
               ) : currentView === 'dashboard' ? (
                 <motion.div key="dashboard" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
-                  <h2 className="text-3xl font-bold mb-6">Progresul Meu</h2>
-                  <ProgressTracker />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <StudyTimer />
-                    <div className="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
-                      <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                        <Star className="text-amber-500" size={20} />
-                        Provocarea Zilei
-                      </h3>
-                      <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">Rezolvă o problemă de logică pentru a-ți menține mintea antrenată!</p>
-                      <div className="bg-zinc-50 dark:bg-zinc-800 p-4 rounded-2xl mb-4 text-sm italic">
-                        "Dacă toți A sunt B și unii B sunt C, rezultă obligatoriu că unii A sunt C?"
+                  <h2 className="text-3xl font-bold mb-6 text-zinc-900 dark:text-zinc-100">Progresul Meu</h2>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2 space-y-8">
+                      <DailyMathQuote />
+                      <DailyChallenge />
+                      <ProgressTracker />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <StudyTimer />
+                        <StudyPlanner />
                       </div>
-                      <button className="w-full py-2 bg-zinc-900 dark:bg-zinc-700 text-white rounded-xl text-sm font-medium hover:bg-zinc-800 transition-colors">
-                        Vezi Răspunsul
-                      </button>
+                      <ProgressCharts />
+                      <AchievementSystem />
+                      <MentalMathGame />
+                    </div>
+                    <div className="space-y-8">
+                      <ExamCountdown />
+                      <MathDictionary />
+                      <MathNews />
+                      <Leaderboard />
+                      <ReviewCenter />
+                      <DashboardSettings />
+                      <GlobalChat />
+                      <FunctionPlotter />
                     </div>
                   </div>
+                </motion.div>
+              ) : currentView === 'ultimate' ? (
+                <motion.div key="ultimate" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                  <UltimateMath />
+                </motion.div>
+              ) : currentView === 'flashcards' ? (
+                <motion.div key="flashcards" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                  <FlashcardSystem />
+                </motion.div>
+              ) : currentView === 'bac-exam' ? (
+                <motion.div key="bac-exam" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                  <BacExamMode />
                 </motion.div>
               ) : selectedLesson ? (
                 <motion.div
@@ -218,11 +279,23 @@ export default function App() {
                         <BookOpen size={20} />
                         <span className="text-sm font-semibold uppercase tracking-wider">Lecție • Clasa {selectedGrade}-a</span>
                       </div>
-                      <h2 className="text-3xl lg:text-4xl font-bold mb-6 leading-tight text-zinc-900 dark:text-zinc-100">
-                        {selectedLesson.title}
-                      </h2>
+                      <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-3xl lg:text-4xl font-bold leading-tight text-zinc-900 dark:text-zinc-100">
+                          {selectedLesson.title}
+                        </h2>
+                        <div className="flex items-center gap-2">
+                          <button 
+                            onClick={() => setShowAI(true)}
+                            className="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl text-xs font-bold hover:bg-indigo-100 transition-all"
+                          >
+                            <Sparkles size={14} />
+                            Explică-mi simplu
+                          </button>
+                          <NoteExport lessonTitle={selectedLesson.title} content={selectedLesson.content} />
+                        </div>
+                      </div>
                       <div className="prose prose-zinc dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:text-zinc-600 dark:prose-p:text-zinc-400 prose-li:text-zinc-600 dark:prose-li:text-zinc-400">
-                        <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{selectedLesson.content}</Markdown>
+                        <Markdown>{selectedLesson.content}</Markdown>
                       </div>
 
                       {selectedLesson.problems && selectedLesson.problems.length > 0 && (
@@ -311,6 +384,12 @@ export default function App() {
           </div>
         </div>
       </footer>
+      <QuickActionMenu onAction={(action) => {
+        if (action === 'ai') setShowAI(true);
+        if (action === 'timer' || action === 'notes' || action === 'chat') {
+          setCurrentView('dashboard');
+        }
+      }} />
     </div>
   );
 }

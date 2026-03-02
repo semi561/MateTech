@@ -2,13 +2,13 @@ import React from 'react';
 import { Search, Copy, Check } from 'lucide-react';
 
 const FORMULAS = [
-  { category: 'Algebră', title: 'Ecuația de gradul II', formula: 'ax^2 + bx + c = 0 \\implies \\Delta = b^2 - 4ac, x_{1,2} = \\frac{-b \\pm \\sqrt{\\Delta}}{2a}' },
-  { category: 'Algebră', title: 'Progresii Aritmetice', formula: 'a_n = a_1 + (n-1)r, S_n = \\frac{(a_1 + a_n)n}{2}' },
-  { category: 'Algebră', title: 'Progresii Geometrice', formula: 'b_n = b_1 \\cdot q^{n-1}, S_n = b_1 \\frac{q^n - 1}{q - 1}' },
-  { category: 'Trigonometrie', title: 'Formula Fundamentală', formula: '\\sin^2 x + \\cos^2 x = 1' },
-  { category: 'Trigonometrie', title: 'Teorema Sinusurilor', formula: '\\frac{a}{\\sin A} = \\frac{b}{\\sin B} = \\frac{c}{\\sin C} = 2R' },
-  { category: 'Analiză', title: 'Derivate Uzuale', formula: '(x^n)\' = nx^{n-1}, (\\ln x)\' = \\frac{1}{x}, (e^x)\' = e^x' },
-  { category: 'Analiză', title: 'Integrale Uzuale', formula: '\\int x^n dx = \\frac{x^{n+1}}{n+1} + C, \\int \\frac{1}{x} dx = \\ln|x| + C' },
+  { category: 'Algebră', title: 'Ecuația de gradul II', formula: 'ax^2 + bx + c = 0 => Delta = b^2 - 4ac, x1,2 = (-b +/- sqrt(Delta)) / 2a' },
+  { category: 'Algebră', title: 'Progresii Aritmetice', formula: 'an = a1 + (n-1)r, Sn = (a1 + an) * n / 2' },
+  { category: 'Algebră', title: 'Progresii Geometrice', formula: 'bn = b1 * q^(n-1), Sn = b1 * (q^n - 1) / (q - 1)' },
+  { category: 'Trigonometrie', title: 'Formula Fundamentală', formula: 'sin^2(x) + cos^2(x) = 1' },
+  { category: 'Trigonometrie', title: 'Teorema Sinusurilor', formula: 'a / sin(A) = b / sin(B) = c / sin(C) = 2R' },
+  { category: 'Analiză', title: 'Derivate Uzuale', formula: '(x^n)\' = n*x^(n-1), (ln x)\' = 1/x, (e^x)\' = e^x' },
+  { category: 'Analiză', title: 'Integrale Uzuale', formula: 'integral(x^n dx) = x^(n+1) / (n+1) + C, integral(1/x dx) = ln|x| + C' },
 ];
 
 export const FormulaSheet: React.FC = () => {
